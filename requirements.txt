@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-dotenv
+pydantic
+openai
+pyttsx3
+speechrecognition
+python-jose
+twilio
+pymongo

@@ -1,0 +1,38 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #1b55ac;
+  }
+  
+  .chat-screen {
+    padding: 1rem;
+    max-width: 600px;
+    margin: auto;
+    background: rgb(161, 62, 62);
+    height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 0 10px rgba(119, 19, 19, 0.1);
+  }
+  
+  .message-bubble {
+    padding: 0.8rem;
+    margin: 0.5rem 0;
+    border-radius: 1rem;
+    max-width: 80%;
+  }
+  
+  .message-bubble.user {
+    background-color: #63aa2d;
+    align-self: flex-end;
+  }
+  
+  .message-bubble.ai {
+    background-color: #a52828;
+    align-self: flex-start;
+  }
+  
+  .typing-indicator {
+    font-style: italic;
+    color: gray;
+  }
+  
