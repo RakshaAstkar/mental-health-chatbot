@@ -12,6 +12,6 @@ Registers a new user.
 **Body:**
 ```json
 {
-  "email": "user@example.com",
+  "username": "testuser",
   "password": "yourpassword"
 }

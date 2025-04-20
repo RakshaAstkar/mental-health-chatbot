@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
-import  api  from '../../services/api';
+import api from '../../services/api';
 import useSpeechRecognition from '../common/SpeechRecognition';
 import speak from '../common/SpeechSynthesis';
 
@@ -24,12 +24,19 @@ const ChatScreen = () => {
     setIsTyping(true);
 
     try {
+      console.log("Sending message to API:", textToSend); // Debugging log
       const response = await api.sendMessage({ message: textToSend });
+      console.log("Response from API:", response); // Debugging log
+
       const botMessage = { sender: 'bot', text: response.reply };
       setMessages((prev) => [...prev, botMessage]);
-      speak(response.reply);
     } catch (err) {
-      console.error('Error:', err);
+      console.error("Error in handleSend:", err); // Debugging log
+      const errorMessage = {
+        sender: 'bot',
+        text: "I'm sorry, the service is currently unavailable due to exceeded usage limits. Please try again later.",
+      };
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsTyping(false);
     }
