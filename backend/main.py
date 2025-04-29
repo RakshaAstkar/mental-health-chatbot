@@ -1,16 +1,14 @@
-from fastapi import FastAPI, Depends, HTTPException, WebSocket
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import FastAPI, HTTPException, WebSocket, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Optional
-import bcrypt
-from jose import jwt
-from datetime import datetime, timedelta
-import openai
+from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
+from datetime import datetime, timedelta
+import bcrypt
+import openai
 from dotenv import load_dotenv
-import os
-
 from backend.app.services.ai.chat_processing import generate_response
+from backend.app.services.ai.crisis_detection import detect_crisis, send_crisis_alert
+from jose import jwt
 
 load_dotenv()
 
@@ -68,13 +66,26 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
 async def root():
     return {"message": "Welcome to the Mental Health Chatbot API"}
 
+# Chat request model
 class ChatRequest(BaseModel):
     message: str
 
+# Chat endpoint with crisis detection
 @app.post("/chat")
 async def chat_endpoint(request: ChatRequest):
     print(f"Received request with method: POST")  # Debugging log
     print(f"Received message: {request.message}")  # Debugging log
+
+    # Check for crisis keywords
+    if detect_crisis(request.message):
+        print("Crisis detected! Sending alert...")  # Debugging log
+        user_email = "rakshaastkar@gmail.com"  # Placeholder email for anonymous users
+        send_crisis_alert(user_email, request.message)
+        return {
+            "reply": "We have detected a potential crisis. Please reach out to someone you trust or call a crisis hotline for immediate help."
+        }
+
+    # Generate a response using OpenAI API
     try:
         bot_reply = await generate_response(request.message)
         print(f"Bot reply: {bot_reply}")  # Debugging log
@@ -83,10 +94,7 @@ async def chat_endpoint(request: ChatRequest):
         print(f"Error in /chat endpoint: {e}")  # Debugging log
         raise HTTPException(status_code=500, detail="An error occurred while processing your request.")
 
-@app.get("/chat")
-async def chat_debug():
-    return {"message": "This endpoint only supports POST requests. Please send a POST request to /chat."}
-
+# WebSocket endpoint for real-time chat
 @app.websocket("/ws/chat")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -94,6 +102,7 @@ async def websocket_endpoint(websocket: WebSocket):
         data = await websocket.receive_text()
         await websocket.send_text(f"Message received: {data}")
 
+# Generate response function
 async def generate_response(message: str) -> str:
     print(f"API call for message: {message}")  # Log each API call
     try:

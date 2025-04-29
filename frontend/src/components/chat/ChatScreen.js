@@ -1,12 +1,12 @@
 // src/components/chat/ChatScreen.js
 import React, { useState } from 'react';
+import Dashboard from '../dashboard/Dashboard';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
 import api from '../../services/api';
 import useSpeechRecognition from '../common/SpeechRecognition';
-import speak from '../common/SpeechSynthesis';
 
-const ChatScreen = () => {
+const ChatScreen = ({ bdiScore }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -34,7 +34,7 @@ const ChatScreen = () => {
       console.error("Error in handleSend:", err); // Debugging log
       const errorMessage = {
         sender: 'bot',
-        text: "I'm sorry, the service is currently unavailable due to exceeded usage limits. Please try again later.",
+        text: "I'm sorry, the service is currently unavailable. Please try again later.",
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
@@ -43,32 +43,40 @@ const ChatScreen = () => {
   };
 
   return (
-    <div className="chat-screen-container" style={styles.container}>
-      <div className="messages" style={styles.messages}>
-        {messages.map((msg, idx) => (
-          <MessageBubble key={idx} sender={msg.sender} text={msg.text} />
-        ))}
-        {isTyping && <TypingIndicator />}
+    <div style={styles.container}>
+      {/* Dashboard Section */}
+      <div style={styles.dashboard}>
+        <Dashboard bdiScore={bdiScore} />
       </div>
 
-      <div className="input-area" style={styles.inputArea}>
-        <input
-          style={styles.input}
-          type="text"
-          placeholder="How are you feeling today?"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-        />
-        <button style={styles.sendButton} onClick={() => handleSend()}>
-          ➤
-        </button>
-        <button
-          style={styles.micButton}
-          onClick={listening ? stopListening : startListening}
-        >
-          {listening ? '🛑' : '🎤'}
-        </button>
+      {/* Chat Section */}
+      <div style={styles.chat}>
+        <div style={styles.messages}>
+          {messages.map((msg, idx) => (
+            <MessageBubble key={idx} sender={msg.sender} text={msg.text} />
+          ))}
+          {isTyping && <TypingIndicator />}
+        </div>
+
+        <div style={styles.inputArea}>
+          <input
+            style={styles.input}
+            type="text"
+            placeholder="How are you feeling today?"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+          />
+          <button style={styles.sendButton} onClick={() => handleSend()}>
+            ➤
+          </button>
+          <button
+            style={styles.micButton}
+            onClick={listening ? stopListening : startListening}
+          >
+            {listening ? '🛑' : '🎤'}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -76,22 +84,32 @@ const ChatScreen = () => {
 
 const styles = {
   container: {
-    maxWidth: '600px',
+    display: 'flex',
     height: '100vh',
-    margin: '0 auto',
+    fontFamily: '"Segoe UI", sans-serif',
+    backgroundColor: '#f9f9fb',
+  },
+  dashboard: {
+    width: '25%',
+    backgroundColor: '#ffffff',
+    padding: '16px',
+    boxShadow: '0 0 20px rgba(0,0,0,0.05)',
+    borderRight: '1px solid #ddd',
+  },
+  chat: {
+    flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: '#f9f9fb',
     padding: '16px',
-    borderRadius: '12px',
-    boxShadow: '0 0 20px rgba(0,0,0,0.05)',
-    fontFamily: '"Segoe UI", sans-serif',
   },
   messages: {
     flex: 1,
     overflowY: 'auto',
     marginBottom: '12px',
     padding: '8px',
+    backgroundColor: '#ffffff',
+    borderRadius: '8px',
+    boxShadow: '0 2px 12px rgba(0,0,0,0.1)',
   },
   inputArea: {
     display: 'flex',

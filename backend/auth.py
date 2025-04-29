@@ -3,7 +3,6 @@ from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
-import bcrypt
 
 # Secret key and algorithm for JWT encoding/decoding
 SECRET_KEY = "0f560476562ed6ec4208ff81558881d9710d1970cd7a9452ba3d68ea3dbcdc66"
